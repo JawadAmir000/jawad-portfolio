@@ -1,0 +1,62 @@
+---
+title: "Microservices at Scale: Patterns That Actually Work"
+description: "Battle-tested patterns for building resilient microservices from real-world experience."
+date: "2024-09-05"
+tags: ["Microservices", "Kubernetes", "RabbitMQ", "Docker"]
+featured: false
+---
+
+After building microservices for Fortune 500 companies, I've learned which patterns work in production and which ones are just theoretical. Here are the practical insights.
+
+## Pattern 1: API Gateway with Ocelot
+
+Don't expose your microservices directly. Use an API Gateway:
+
+```csharp
+// ocelot.json
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/orders/{everything}",
+      "UpstreamPathTemplate": "/orders/{everything}",
+      "ServiceName": "order-service",
+      "LoadBalancerOptions": { "Type": "RoundRobin" }
+    }
+  ]
+}
+```
+
+## Pattern 2: Event-Driven Communication
+
+Use RabbitMQ with MassTransit for reliable async messaging:
+
+```csharp
+public class OrderCreatedConsumer : IConsumer<OrderCreated>
+{
+    public async Task Consume(ConsumeContext<OrderCreated> context)
+    {
+        // Process the order event
+        await _inventoryService.ReserveItems(context.Message.Items);
+    }
+}
+```
+
+## Pattern 3: Circuit Breaker
+
+Prevent cascade failures with Polly:
+
+```csharp
+services.AddHttpClient<IPaymentService, PaymentService>()
+    .AddPolicyHandler(Policy
+        .Handle<HttpRequestException>()
+        .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+```
+
+## What Actually Matters
+
+1. **Observability first**: You can't fix what you can't see
+2. **Start monolithic**: Extract services only when needed
+3. **Embrace eventual consistency**: It's not a bug, it's a feature
+4. **Automate everything**: Manual deployments don't scale
+
+Microservices add complexity. Make sure you actually need them before adopting.

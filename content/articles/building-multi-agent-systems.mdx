@@ -1,0 +1,51 @@
+---
+title: "Building Multi-Agent AI Systems with Claude SDK"
+description: "A deep dive into orchestrating multiple AI agents for complex tasks using Claude Agent SDK and Python."
+date: "2024-12-10"
+tags: ["AI", "Claude SDK", "Multi-Agent", "Python"]
+featured: true
+---
+
+Building multi-agent AI systems has become increasingly important as we tackle more complex problems that require specialized expertise. In this article, I'll share my experience building the Donna AI platform using Claude Agent SDK.
+
+## Why Multi-Agent Architecture?
+
+Traditional single-agent systems struggle with complex tasks that require different types of expertise. A multi-agent approach allows us to:
+
+- **Specialize agents** for specific domains (research, coding, analysis)
+- **Parallelize work** across multiple agents
+- **Maintain context** through agent orchestration
+- **Scale complexity** without overwhelming a single model
+
+## The Donna AI Architecture
+
+At Autonomix, we built Donna with a hierarchical agent structure:
+
+```python
+from anthropic import Anthropic
+
+class AgentOrchestrator:
+    def __init__(self):
+        self.client = Anthropic()
+        self.agents = {
+            "researcher": ResearchAgent(),
+            "coder": CodingAgent(),
+            "analyst": AnalysisAgent(),
+        }
+
+    async def process_task(self, task: str):
+        # Route to appropriate agent
+        agent = self.classify_and_route(task)
+        return await agent.execute(task)
+```
+
+## Key Learnings
+
+1. **Agent Communication**: Use structured message passing between agents
+2. **State Management**: Maintain conversation context across agent boundaries
+3. **Error Recovery**: Implement graceful fallbacks when agents fail
+4. **Cost Optimization**: Route simple tasks to faster, cheaper models
+
+## Conclusion
+
+Multi-agent systems are the future of AI applications. Start small with 2-3 specialized agents and scale as needed.
