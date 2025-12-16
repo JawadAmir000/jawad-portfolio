@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://jawadamir.dev",
+    url: "https://jawadamir000.github.io/jawad-portfolio",
     title: "Jawad Amir - Senior Software Engineer & AI Specialist",
     description:
       "Building high-performance, cloud-native, and AI-driven solutions across Fortune 500 enterprises and startups.",
@@ -69,13 +69,17 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex min-h-screen flex-col">
+          {/* Animated background */}
+          <div className="fixed inset-0 -z-10 animated-gradient-bg" />
+          <div className="fixed inset-0 -z-10 grid-pattern opacity-50" />
+
+          <div className="relative flex min-h-screen flex-col">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 pt-24">{children}</main>
             <Footer />
           </div>
         </ThemeProvider>

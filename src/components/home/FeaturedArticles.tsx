@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight, BookOpen, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import type { Article } from "@/lib/articles";
 
@@ -9,71 +12,113 @@ interface FeaturedArticlesProps {
 
 export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
   return (
-    <section className="mb-16 sm:mb-24">
-      <h2 className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">
-        Latest Articles
-      </h2>
+    <section className="py-20">
+      {/* Section Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="flex items-center gap-4 mb-12"
+      >
+        <div className="p-3 glass rounded-xl">
+          <BookOpen className="w-6 h-6 text-teal-400" />
+        </div>
+        <div>
+          <h2 className="text-3xl font-bold text-zinc-100">Latest Articles</h2>
+          <p className="text-zinc-500">Thoughts on AI, architecture, and engineering</p>
+        </div>
+      </motion.div>
 
-      <div className="mt-12 space-y-4">
-        {articles.map((article) => (
-          <ArticleCard key={article.slug} article={article} />
+      {/* Articles Grid */}
+      <div className="space-y-6">
+        {articles.map((article, index) => (
+          <ArticleCard key={article.slug} article={article} index={index} />
         ))}
       </div>
 
-      <Link
-        href="/articles"
-        className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-teal-500 hover:text-teal-400 transition-colors"
+      {/* View All Link */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="mt-10"
       >
-        View all articles
-        <ArrowRight className="h-4 w-4" />
-      </Link>
+        <Link
+          href="/jawad-portfolio/articles"
+          className="group inline-flex items-center gap-2 text-teal-400 font-medium hover:text-teal-300 transition-colors"
+        >
+          View all articles
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </motion.div>
     </section>
   );
 }
 
-function ArticleCard({ article }: { article: Article }) {
+function ArticleCard({ article, index }: { article: Article; index: number }) {
   return (
-    <article className="group relative flex flex-col py-6 sm:flex-row sm:items-baseline">
-      {/* Mobile date with timeline */}
-      <div className="mb-3 flex items-center sm:hidden">
-        <span className="mr-3 h-px w-4 bg-zinc-300 dark:bg-zinc-700" />
-        <time
-          dateTime={article.date}
-          className="text-sm text-zinc-500 dark:text-zinc-400"
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+    >
+      <Link href={`/jawad-portfolio/articles/${article.slug}`}>
+        <motion.div
+          className="glass glass-hover p-6 sm:p-8 group cursor-pointer"
+          whileHover={{ scale: 1.01, y: -4 }}
+          transition={{ duration: 0.2 }}
         >
-          {formatDate(article.date)}
-        </time>
-      </div>
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
+            {/* Date Column */}
+            <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:w-32 shrink-0">
+              <time
+                dateTime={article.date}
+                className="text-sm text-zinc-500"
+              >
+                {formatDate(article.date)}
+              </time>
+              <div className="flex items-center gap-1 text-xs text-zinc-600">
+                <Clock className="w-3 h-3" />
+                <span>{article.readingTime}</span>
+              </div>
+            </div>
 
-      {/* Card background with hover effect */}
-      <div className="absolute -inset-x-4 -inset-y-2 z-0 scale-95 rounded-2xl bg-zinc-50 opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 dark:bg-zinc-800/50 sm:-inset-x-6" />
+            {/* Content */}
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold text-zinc-100 group-hover:text-teal-400 transition-colors mb-3">
+                {article.title}
+              </h3>
 
-      {/* Desktop date */}
-      <time
-        dateTime={article.date}
-        className="relative z-10 hidden text-sm text-zinc-500 dark:text-zinc-400 sm:block sm:w-32 sm:flex-shrink-0"
-      >
-        {formatDate(article.date)}
-      </time>
+              <p className="text-zinc-400 mb-4 line-clamp-2">
+                {article.description}
+              </p>
 
-      {/* Content */}
-      <div className="relative z-10 flex-1">
-        <h3 className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
-          <Link href={`/articles/${article.slug}`}>
-            <span className="absolute -inset-x-4 -inset-y-2 z-20 sm:-inset-x-6" />
-            {article.title}
-          </Link>
-        </h3>
+              {/* Tags */}
+              {article.tags && article.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {article.tags.slice(0, 4).map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 text-xs font-medium bg-teal-500/10 text-teal-400 rounded-full border border-teal-500/20"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
 
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          {article.description}
-        </p>
-
-        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-teal-500">
-          Read article
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </span>
-      </div>
-    </article>
+              {/* Read More */}
+              <span className="inline-flex items-center gap-2 text-sm font-medium text-teal-400 group-hover:gap-3 transition-all">
+                Read article
+                <ArrowRight className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+        </motion.div>
+      </Link>
+    </motion.article>
   );
 }
