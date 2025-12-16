@@ -1,0 +1,181 @@
+---
+title: "Building a Graphiti Knowledge Base with Python"
+description: "Learn how to build a graph-based RAG system using Graphiti and Python for smarter retrieval and richer context in your AI applications."
+date: "2024-12-16"
+tags: ["Python", "RAG", "Knowledge Graph", "Graphiti", "AI"]
+featured: true
+---
+
+If you're ready to take your retrieval-augmented generation (RAG) projects to the next level, building a knowledge base with Graphiti and Python is a smart move. You already know the basics of RAG and graph structures, so I'll focus on how Graphiti lets you model, ingest, and query knowledge in a way that's both flexible and powerful.
+
+## Why Graph-Based RAG?
+
+Why bother with a graph-based RAG setup? Well, traditional RAG pipelines often rely on flat, vectorized chunks of text. That works, but it's like trying to navigate a city with only a list of street names—no map, no context. Graph-based RAG, on the other hand, captures relationships, hierarchies, and semantic connections between your data. This means more relevant retrieval, richer context, and ultimately, smarter generative outputs.
+
+Graphiti brings this to life by letting you build, query, and update a knowledge graph that's deeply integrated with your RAG workflow. It's open-source, Python-friendly, and designed for developers who want to move beyond simple document retrieval.
+
+> **Tip:** If you're comfortable with Python and have at least a passing familiarity with embeddings, you're in the right place.
+
+## Architecture of a Graphiti-based Knowledge Base
+
+Before we dive into code, it helps to see the big picture. Here's how the components fit together in a typical Graphiti-powered RAG system:
+
+In this setup, data flows from your sources (documents, databases, APIs) into Graphiti, where it's structured as nodes and edges. Embeddings are generated and stored in a vector database. When a user query comes in, Graphiti retrieves relevant subgraphs, providing rich context for your generative model.
+
+## Graphiti Overview and Core Concepts
+
+So, what exactly is Graphiti? At its core, Graphiti is an open-source framework for building graph-based RAG systems in Python. It lets you define a schema (nodes, edges, properties), ingest data, generate embeddings, and run graph queries—all with a Pythonic API.
+
+### Key concepts you'll encounter:
+
+- **Nodes**: Represent entities like documents, authors, or topics.
+- **Edges**: Capture relationships (e.g., "written by", "references").
+- **Embeddings**: Vector representations of nodes or relationships, powering semantic search.
+- **Schema**: Your blueprint for how data is structured in the graph.
+
+Graphiti fits neatly into the Python RAG stack, playing well with vector databases and embedding models. Typical use cases include document retrieval, knowledge graph question answering, and context-rich chatbots.
+
+> **Note:** Graphiti's strength is in modeling complex, interconnected data—think research papers, legal documents, or enterprise knowledge bases where relationships matter.
+
+## Setting Up and Ingesting Data with Graphiti
+
+Let's get hands-on. Here's how to set up Graphiti, define your schema, and ingest some sample data. This is the foundation for building your knowledge base.
+
+```python
+# Install Graphiti
+# pip install graphiti-core
+
+from graphiti_core import Graphiti
+from graphiti_core.nodes import EpisodeNode
+from datetime import datetime
+
+# Initialize Graphiti client
+client = Graphiti(
+    neo4j_uri="bolt://localhost:7687",
+    neo4j_user="neo4j",
+    neo4j_password="your_password"
+)
+
+# Define your schema - nodes and relationships
+async def setup_knowledge_base():
+    # Initialize the graph database
+    await client.build_indices_and_constraints()
+
+    # Add episodes (data units) to your knowledge base
+    episodes = [
+        {
+            "name": "Introduction to RAG",
+            "content": "RAG combines retrieval with generation...",
+            "source": "documentation"
+        },
+        {
+            "name": "Graph Databases 101",
+            "content": "Graph databases store data as nodes and edges...",
+            "source": "tutorial"
+        }
+    ]
+
+    for episode in episodes:
+        await client.add_episode(
+            name=episode["name"],
+            episode_body=episode["content"],
+            source_description=episode["source"],
+            reference_time=datetime.now()
+        )
+
+# Run the setup
+import asyncio
+asyncio.run(setup_knowledge_base())
+```
+
+This setup covers installing Graphiti, defining your node and edge types, and loading in a few documents with metadata. The schema is where you decide what entities and relationships matter for your use case—don't be afraid to iterate!
+
+Once ingested, your data isn't just a pile of vectors; it's a living graph, ready for rich queries and retrieval.
+
+## From Ingestion to Querying
+
+Now that your data is structured as a graph, you can move beyond simple keyword or vector search. Graph queries let you traverse relationships, filter by properties, and retrieve contextually relevant subgraphs—crucial for effective RAG.
+
+> **Important:** The power of graph-based RAG comes from these queries. They let you surface not just similar documents, but related concepts, authors, or chains of reasoning.
+
+## Querying the Knowledge Base
+
+Here's where things get interesting. With your knowledge base in place, you can write queries to retrieve nodes, edges, or entire subgraphs relevant to a user's question. This is the backbone of retrieval-augmented generation.
+
+```python
+from graphiti_core import Graphiti
+
+async def query_knowledge_base(query: str):
+    client = Graphiti(
+        neo4j_uri="bolt://localhost:7687",
+        neo4j_user="neo4j",
+        neo4j_password="your_password"
+    )
+
+    # Semantic search across your knowledge graph
+    results = await client.search(
+        query=query,
+        num_results=10
+    )
+
+    # Process and return relevant context
+    context = []
+    for result in results:
+        context.append({
+            "fact": result.fact,
+            "score": result.score,
+            "episodes": result.episodes
+        })
+
+    return context
+
+# Example: Query for RAG-related information
+async def main():
+    results = await query_knowledge_base(
+        "How do graph databases improve RAG systems?"
+    )
+
+    for r in results:
+        print(f"Fact: {r['fact']}")
+        print(f"Relevance Score: {r['score']}")
+        print("---")
+
+asyncio.run(main())
+```
+
+This example demonstrates how to search for relevant nodes, follow relationships, and pull in the context your generative model needs. You can get creative—combine semantic similarity with graph traversal for nuanced retrieval.
+
+## Best Practices and Pitfalls
+
+Building a robust graph-based RAG system isn't just about wiring things together. Here are some tips and common pitfalls:
+
+### Data Modeling
+Choose the right granularity for nodes and relationships. Too coarse, and you lose detail; too fine, and queries get noisy.
+
+### Embedding Selection
+Pick embedding models suited to your data domain. Update embeddings if your data or schema changes.
+
+### Query Efficiency
+Optimize queries for speed and relevance. Use filters and limit traversal depth to avoid performance bottlenecks.
+
+### Scalability
+As your graph grows, monitor storage and retrieval times. Partitioning or sharding may help.
+
+### Troubleshooting
+If queries return irrelevant results, check your schema, embeddings, and relationship definitions. Small tweaks can have big effects.
+
+> **Tip:** Treat your knowledge base as a living system—iterate on schema, embeddings, and queries as your needs evolve.
+
+## Wrapping Up and Next Steps
+
+You've seen how to set up Graphiti, ingest data, and run queries—all in Python. The result? A knowledge base that's not just a collection of documents, but a rich, interconnected graph ready for advanced RAG workflows.
+
+Graphiti's graph-based approach gives you more control, context, and flexibility than traditional vector search. As you explore further, try advanced queries, integrate with your favorite LLMs, or experiment with new data domains.
+
+Curiosity and iteration are your best tools here. The more you play with your schema and queries, the more value you'll unlock from your knowledge base. Happy graphing!
+
+## Suggested Next Steps
+
+1. **Integrate with LLM frameworks**: Connect Graphiti with LlamaIndex or LangChain for end-to-end RAG pipelines.
+2. **Optimize for scale**: Explore strategies for handling large datasets and high query loads.
+3. **Advanced querying**: Experiment with multi-hop reasoning or temporal queries for complex use cases.
