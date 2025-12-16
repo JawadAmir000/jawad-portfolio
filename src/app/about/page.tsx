@@ -175,7 +175,7 @@ export default function AboutPage() {
           <div className="relative">
             <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-zinc-200 bg-zinc-100 shadow-xl dark:border-zinc-700 dark:bg-zinc-800">
               <Image
-                src="/images/profile.jpg"
+                src="/jawad-portfolio/images/profile.jpg"
                 alt="Jawad Amir"
                 fill
                 sizes="192px"
