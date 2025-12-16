@@ -14,7 +14,7 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
         Latest Articles
       </h2>
 
-      <div className="mt-8">
+      <div className="mt-12 space-y-4">
         {articles.map((article) => (
           <ArticleCard key={article.slug} article={article} />
         ))}
