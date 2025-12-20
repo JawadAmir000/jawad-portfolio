@@ -46,7 +46,7 @@ export function FeaturedArticles({ articles }: FeaturedArticlesProps) {
         className="mt-10"
       >
         <Link
-          href="/jawad-portfolio/articles"
+          href="/articles"
           className="group inline-flex items-center gap-2 text-teal-400 font-medium hover:text-teal-300 transition-colors"
         >
           View all articles
@@ -65,7 +65,7 @@ function ArticleCard({ article, index }: { article: Article; index: number }) {
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <Link href={`/jawad-portfolio/articles/${article.slug}`}>
+      <Link href={`/articles/${article.slug}`}>
         <motion.div
           className="glass glass-hover p-6 sm:p-8 group cursor-pointer"
           whileHover={{ scale: 1.01, y: -4 }}

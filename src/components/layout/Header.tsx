@@ -8,10 +8,10 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const navItems = [
-  { href: "/jawad-portfolio", label: "Home" },
-  { href: "/jawad-portfolio/articles", label: "Articles" },
-  { href: "/jawad-portfolio/portfolio", label: "Portfolio" },
-  { href: "/jawad-portfolio/about", label: "About" },
+  { href: "/", label: "Home" },
+  { href: "/articles", label: "Articles" },
+  { href: "/portfolio", label: "Portfolio" },
+  { href: "/about", label: "About" },
 ];
 
 export function Header() {
@@ -28,10 +28,9 @@ export function Header() {
       <Container>
         <nav className="glass rounded-2xl px-6 flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/jawad-portfolio" className="relative group">
+          <Link href="/" className="relative group">
             <span className="text-xl font-bold text-zinc-100 group-hover:text-teal-400 transition-colors">
-              Jawad
-              <span className="text-teal-400">.</span>
+              Jawad <span className="text-teal-400">Amir</span>
             </span>
           </Link>
 
@@ -39,7 +38,7 @@ export function Header() {
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive = pathname === item.href ||
-                (item.href !== "/jawad-portfolio" && pathname?.startsWith(item.href));
+                (item.href !== "/" && pathname?.startsWith(item.href));
 
               return (
                 <Link
@@ -87,7 +86,7 @@ export function Header() {
           >
             {navItems.map((item) => {
               const isActive = pathname === item.href ||
-                (item.href !== "/jawad-portfolio" && pathname?.startsWith(item.href));
+                (item.href !== "/" && pathname?.startsWith(item.href));
 
               return (
                 <Link

@@ -59,7 +59,7 @@ export function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 pl-6">
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -118,14 +118,14 @@ export function Hero() {
           className="flex flex-wrap gap-4 mb-12"
         >
           <a
-            href="/jawad-portfolio/portfolio"
+            href="/portfolio"
             className="group relative px-8 py-4 bg-teal-500 text-black font-semibold rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(20,184,166,0.5)]"
           >
             <span className="relative z-10">View My Work</span>
             <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
           <a
-            href="/jawad-portfolio/about"
+            href="/about"
             className="glass glass-hover px-8 py-4 font-semibold rounded-xl"
           >
             About Me

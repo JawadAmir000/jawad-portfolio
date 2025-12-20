@@ -170,12 +170,12 @@ export default function AboutPage() {
         </div>
 
         {/* Profile Image & Stats Section */}
-        <div className="flex flex-col items-center gap-8 lg:items-end">
+        <div className="flex flex-col items-center gap-8 lg:items-center">
           {/* Profile Image */}
           <div className="relative">
             <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-zinc-200 bg-zinc-100 shadow-xl dark:border-zinc-700 dark:bg-zinc-800">
               <Image
-                src="/jawad-portfolio/images/profile.jpg"
+                src="/images/profile.jpg"
                 alt="Jawad Amir"
                 fill
                 sizes="192px"
@@ -208,9 +208,9 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="rounded-2xl border border-zinc-200 bg-white p-4 text-center dark:border-zinc-800 dark:bg-zinc-900">
-              <div className="text-2xl font-bold text-teal-500">280+</div>
+              <div className="text-2xl font-bold text-teal-500">20+</div>
               <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-                LeetCode Problems
+                AI Agents Built
               </div>
             </div>
           </div>
@@ -316,7 +316,7 @@ export default function AboutPage() {
               <strong className="text-zinc-800 dark:text-zinc-100">
                 Coding Platforms:
               </strong>{" "}
-              LeetCode 280+ problems solved | Codeforces Rating 1279 | Active
+              LeetCode 20+ problems solved | Codeforces Rating 1279 | Active
               GitHub contributor
             </span>
           </li>

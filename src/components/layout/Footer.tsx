@@ -12,10 +12,10 @@ const socialLinks = [
 ];
 
 const navLinks = [
-  { href: "/jawad-portfolio", label: "Home" },
-  { href: "/jawad-portfolio/articles", label: "Articles" },
-  { href: "/jawad-portfolio/portfolio", label: "Portfolio" },
-  { href: "/jawad-portfolio/about", label: "About" },
+  { href: "/", label: "Home" },
+  { href: "/articles", label: "Articles" },
+  { href: "/portfolio", label: "Portfolio" },
+  { href: "/about", label: "About" },
 ];
 
 export function Footer() {
@@ -37,10 +37,9 @@ export function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <Link href="/jawad-portfolio" className="inline-block group">
+            <Link href="/" className="inline-block group">
               <span className="text-2xl font-bold text-zinc-100 group-hover:text-teal-400 transition-colors">
-                Jawad
-                <span className="text-teal-400">.</span>
+                Jawad <span className="text-teal-400">Amir</span>
               </span>
             </Link>
             <p className="mt-4 text-sm text-zinc-500 max-w-xs leading-relaxed">
