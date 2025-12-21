@@ -27,7 +27,7 @@ export async function getProjects(): Promise<Project[]> {
       tags: ["Python", "Django", "Claude SDK", "ElevenLabs", "HeyGen", "Azure AI"],
       featured: true,
       company: "Autonomix (Startup)",
-      role: "Lead Developer",
+      role: "Senior AI Engineer",
       highlights: [
         "Built multimodal AI assistant with Claude Agent SDK, ElevenLabs voice AI, and HeyGen video avatars",
         "Architected multi-agent orchestration system using Python/Django and Azure AI Foundry",

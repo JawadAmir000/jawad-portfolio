@@ -316,7 +316,7 @@ export default function AboutPage() {
               <strong className="text-zinc-800 dark:text-zinc-100">
                 Coding Platforms:
               </strong>{" "}
-              LeetCode 20+ problems solved | Codeforces Rating 1279 | Active
+              LeetCode 300+ problems solved | Codeforces Rating 1279 | Active
               GitHub contributor
             </span>
           </li>

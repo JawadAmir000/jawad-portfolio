@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail, ArrowDown, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 const socialLinks = [
   { href: "https://github.com/JawadAmir000", icon: Github, label: "GitHub" },
@@ -117,19 +118,19 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="flex flex-wrap gap-4 mb-12"
         >
-          <a
+          <Link
             href="/portfolio"
             className="group relative px-8 py-4 bg-teal-500 text-black font-semibold rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(20,184,166,0.5)]"
           >
             <span className="relative z-10">View My Work</span>
             <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </a>
-          <a
+          </Link>
+          <Link
             href="/about"
             className="glass glass-hover px-8 py-4 font-semibold rounded-xl"
           >
             About Me
-          </a>
+          </Link>
         </motion.div>
 
         {/* Social Links */}

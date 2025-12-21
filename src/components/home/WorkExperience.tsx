@@ -2,20 +2,23 @@
 
 import { motion } from "framer-motion";
 import { Briefcase, Building2, Rocket } from "lucide-react";
+import Link from "next/link";
 
 const experiences = [
   {
+    slug: "iqvia",
     company: "IQVIA",
     role: "Senior Software Engineer",
-    period: "2024 - Present",
+    period: "Sep 2024 - Present",
     description: "Healthcare AI & Microservices",
     type: "Fortune 500",
     icon: Building2,
     color: "from-blue-500 to-cyan-500",
   },
   {
+    slug: "autonomix",
     company: "Autonomix",
-    role: "Lead Developer",
+    role: "Senior AI Engineer",
     period: "2024 - Present",
     description: "AI Platform - Donna",
     type: "Startup",
@@ -23,11 +26,12 @@ const experiences = [
     color: "from-teal-500 to-emerald-500",
   },
   {
+    slug: "secured-link-service",
     company: "Secured Link Service",
     role: "Software Engineer",
-    period: "2022 - 2024",
+    period: "2019 - 2024",
     description: "Fintech & Blockchain Solutions",
-    type: "Switzerland",
+    type: "Fintech",
     icon: Building2,
     color: "from-purple-500 to-pink-500",
   },
@@ -67,8 +71,9 @@ export function WorkExperience() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
+              <Link href={`/experience/${exp.slug}`}>
               <motion.div
-                className="glass glass-hover p-6 sm:pl-16 relative group"
+                className="glass glass-hover p-6 sm:pl-16 relative group cursor-pointer"
                 whileHover={{ scale: 1.01, x: 4 }}
                 transition={{ duration: 0.2 }}
               >
@@ -105,6 +110,7 @@ export function WorkExperience() {
                   </span>
                 </div>
               </motion.div>
+              </Link>
             </motion.div>
           ))}
         </div>

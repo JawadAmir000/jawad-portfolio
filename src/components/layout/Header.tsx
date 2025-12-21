@@ -30,7 +30,7 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="relative group">
             <span className="text-xl font-bold text-zinc-100 group-hover:text-teal-400 transition-colors">
-              Jawad <span className="text-teal-400">Amir</span>
+              Jawad Amir
             </span>
           </Link>
 
