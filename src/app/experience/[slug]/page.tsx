@@ -8,7 +8,6 @@ import {
 } from "@/lib/experiences";
 import {
   ArrowLeft,
-  Building2,
   MapPin,
   Calendar,
   CheckCircle2,
