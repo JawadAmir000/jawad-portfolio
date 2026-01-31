@@ -1,11 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  output: 'export', // Required for GitHub Pages static hosting
   images: {
-    unoptimized: true,
+    unoptimized: true, // Required for static export
   },
-  basePath: process.env.NODE_ENV === 'production' ? '/jawad-portfolio' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/jawad-portfolio/' : '',
 };
 
 export default nextConfig;
