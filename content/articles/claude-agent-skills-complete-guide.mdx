@@ -1,0 +1,304 @@
+---
+title: "Claude Agent Skills: What They Are, Why They Matter, and How to Build Your Own"
+description: "A deep dive into Anthropic's Agent Skills — the open standard that turns general-purpose AI agents into specialized experts. Learn the architecture, the spec, and how to create your own skills."
+date: "2026-02-05"
+tags: ["AI", "Claude", "Anthropic", "Agent Skills", "Agentic AI", "Developer Tools"]
+featured: true
+---
+
+If you've been following the AI agent space, you've probably noticed a shift. We're moving from *"AI that answers questions"* to *"AI that does work."* But here's the problem: general-purpose agents are great at many things, yet reliably excellent at almost nothing specific — unless you give them the right context.
+
+That's exactly what **Agent Skills** solve.
+
+## What Are Agent Skills?
+
+Agent Skills are an **open standard** created by Anthropic for giving AI agents new capabilities and domain expertise. At their core, they're simple: folders containing instructions, scripts, and resources that agents can discover and load dynamically.
+
+Think of skills as **onboarding guides for AI**. Instead of building fragmented, custom agents for every use case, you package your expertise into composable, portable skill folders that any compatible agent can use.
+
+```
+my-skill/
+├── SKILL.md          # Required — instructions + metadata
+├── scripts/          # Optional — executable code
+├── references/       # Optional — additional documentation
+└── assets/           # Optional — templates, schemas, data
+```
+
+The format is intentionally minimal. A skill needs exactly one file: `SKILL.md` with YAML frontmatter and markdown instructions.
+
+## Why Do We Need Skills?
+
+Here's the core tension: **models are getting incredibly capable, but they lack your context.**
+
+Claude can write excellent code, analyze data, create documents, and reason through complex problems. But it doesn't know your company's brand guidelines, your team's deployment workflow, your data analysis pipeline, or your legal review process.
+
+Skills bridge this gap in three important ways:
+
+### 1. Composable Expertise
+
+Instead of one monolithic prompt trying to cover everything, skills let you compose specialized capabilities:
+
+- A **PDF skill** teaches Claude to manipulate PDFs, extract forms, and merge documents
+- A **branding skill** teaches Claude your company's visual identity and tone
+- A **deployment skill** teaches Claude your CI/CD pipeline
+
+Each skill is independent. Mix and match based on the task.
+
+### 2. Progressive Disclosure
+
+This is the killer design principle. Skills don't dump everything into the context window at once:
+
+- **Level 1 (~100 tokens):** Only the skill's `name` and `description` are loaded at startup
+- **Level 2:** If Claude determines the skill is relevant, it reads the full `SKILL.md`
+- **Level 3+:** Additional referenced files are loaded only when needed
+
+This means you can bundle effectively **unlimited context** into a skill without paying the token cost upfront. Claude navigates the skill like a well-organized manual — table of contents first, then specific chapters, then the appendix.
+
+### 3. Portability
+
+Skills follow the open [AgentSkills specification](https://agentskills.io). Write once, use everywhere:
+
+- **Claude.ai** — Available to all paid plans
+- **Claude Code** — Install as plugins
+- **Claude API** — Upload via the Skills API
+- **OpenClaw/Clawdbot** — Full skills support with auto-discovery
+- **Third-party agents** — Any agent that implements the spec
+
+The standard is maintained by Anthropic but open to community contributions via [GitHub](https://github.com/agentskills/agentskills).
+
+## How Skills Work Under the Hood
+
+Let's trace what happens when you interact with an agent that has skills installed:
+
+```
+1. Agent starts
+   → Loads name + description of ALL installed skills into system prompt
+
+2. User sends a message
+   → Claude reads the message and checks skill descriptions
+
+3. Claude identifies relevant skill
+   → Reads the full SKILL.md into context (Bash tool: cat skill/SKILL.md)
+
+4. Claude needs more detail
+   → Reads additional referenced files (references/forms.md, etc.)
+
+5. Claude needs to execute something
+   → Runs bundled scripts (scripts/extract.py, etc.)
+
+6. Task complete
+   → Skill context is in the conversation; available for follow-up
+```
+
+The key insight: **the agent decides when to use skills.** You're not manually triggering them — Claude reads the descriptions and makes the call based on what the user is asking.
+
+## The SKILL.md Specification
+
+Every skill starts with a `SKILL.md` file. Here's the complete format:
+
+```yaml
+---
+name: data-analysis
+description: Analyze datasets using pandas and generate visualizations. 
+  Use when working with CSV, Excel, or Parquet files, or when the user 
+  asks for data exploration, statistical analysis, or chart generation.
+license: Apache-2.0
+compatibility: Requires Python 3.10+, pandas, matplotlib
+metadata:
+  author: your-org
+  version: "1.0"
+allowed-tools: Bash(python:*) Read Write
+---
+```
+
+### Required Fields
+
+| Field | Rules |
+|-------|-------|
+| `name` | 1-64 chars, lowercase + hyphens only, must match directory name |
+| `description` | 1-1024 chars, describes what and when |
+
+### Optional Fields
+
+| Field | Purpose |
+|-------|---------|
+| `license` | License identifier or reference |
+| `compatibility` | Environment requirements |
+| `metadata` | Arbitrary key-value pairs (author, version, etc.) |
+| `allowed-tools` | Pre-approved tools the skill can use |
+
+### The Markdown Body
+
+After the frontmatter, write whatever helps the agent perform the task. There are no format restrictions, but Anthropic recommends:
+
+- **Step-by-step instructions** — The core workflow
+- **Examples** — Input/output pairs
+- **Edge cases** — Common mistakes and how to handle them
+- **File references** — Links to additional docs in the skill folder
+
+> **Pro tip:** Keep your main SKILL.md under 500 lines. Move detailed reference material to separate files in `references/`. This keeps the initial context load lean.
+
+## Real-World Example: The PDF Skill
+
+Let's look at how Anthropic built the skill that powers Claude's document editing capabilities.
+
+The [PDF skill](https://github.com/anthropics/skills/tree/main/skills/pdf) teaches Claude to:
+- Extract text and tables from PDFs
+- Fill out PDF forms
+- Merge multiple documents
+
+The structure:
+
+```
+pdf/
+├── SKILL.md           # Core instructions
+├── reference.md       # Detailed API reference
+├── forms.md          # Form-filling specific instructions
+└── scripts/
+    └── extract.py    # Python script for form field extraction
+```
+
+Notice the progressive disclosure:
+- `SKILL.md` contains the core workflow
+- `forms.md` is only loaded when Claude encounters a form-filling task
+- `extract.py` runs deterministically — Claude doesn't need to load the script into context
+
+This design means Claude pays zero token cost for form-filling context when the user just wants to extract text.
+
+## Building Your Own Skill
+
+Here's a practical walkthrough for creating a skill from scratch.
+
+### Step 1: Identify the Gap
+
+Run your agent on representative tasks and watch where it struggles. Common gaps:
+
+- Company-specific workflows or conventions
+- Specialized domain knowledge
+- Repetitive multi-step processes
+- Tasks requiring deterministic code execution
+
+### Step 2: Create the Structure
+
+```bash
+mkdir my-skill
+touch my-skill/SKILL.md
+```
+
+### Step 3: Write the SKILL.md
+
+```yaml
+---
+name: api-testing
+description: Generate and run API test suites using your team's conventions. 
+  Use when the user asks to test endpoints, create integration tests, 
+  or validate API contracts.
+---
+
+# API Testing Skill
+
+## When to Use
+- User asks to test an API endpoint
+- User wants to generate a test suite
+- User needs to validate response schemas
+
+## Conventions
+- Use pytest as the test framework
+- Group tests by resource (users, orders, etc.)
+- Always include both success and error cases
+- Use fixtures for authentication
+
+## Workflow
+1. Identify the endpoints to test
+2. Check for existing test files in `tests/api/`
+3. Generate test cases following the patterns in existing tests
+4. Run tests with `pytest tests/api/ -v`
+5. Report results with pass/fail summary
+
+## Examples
+
+### Input
+"Write tests for the /api/users endpoint"
+
+### Output
+Create `tests/api/test_users.py` with:
+- test_create_user_success
+- test_create_user_missing_fields
+- test_get_user_by_id
+- test_get_user_not_found
+- test_list_users_pagination
+```
+
+### Step 4: Iterate with Claude
+
+This is Anthropic's strongest recommendation: **develop skills collaboratively with Claude.**
+
+- Use Claude on a task, watch where it goes off track
+- Ask Claude to self-reflect on what context it was missing
+- Have Claude draft the skill content based on successful approaches
+- Refine based on real usage, not assumptions
+
+### Step 5: Install and Test
+
+**Claude Code:**
+```bash
+/plugin install my-skill
+```
+
+**OpenClaw/Clawdbot:** Drop the folder into your workspace's `skills/` directory.
+
+**Claude.ai:** Upload via the Skills UI in settings.
+
+## The Ecosystem: Where Skills Are Heading
+
+### ClawHub / Skills Registries
+
+Public registries like [ClawHub](https://clawhub.ai) let you discover, install, and share skills:
+
+```bash
+clawhub install email        # Install an email skill
+clawhub update --all         # Update all skills
+clawhub sync --all           # Publish your updates
+```
+
+### Skills + MCP
+
+Skills and the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) are complementary:
+
+- **MCP** gives agents access to external tools and data sources
+- **Skills** teach agents *how to use* those tools effectively
+
+Think of MCP as the API and Skills as the documentation + workflow knowledge.
+
+### Self-Improving Agents
+
+Anthropic has signaled that future agents will be able to **create, edit, and evaluate skills on their own** — codifying their successful patterns into reusable capabilities. Your agent literally learns from experience and writes it down for next time.
+
+## Security: Don't Skip This
+
+Skills are powerful, which means they can also be dangerous:
+
+- **Treat third-party skills as untrusted code.** Read them before enabling.
+- **Audit scripts carefully** — especially code dependencies and external network calls.
+- **Use sandboxed execution** for untrusted skills.
+- **Keep secrets in config, not in skill files** — use environment injection.
+
+The OpenClaw docs recommend: *"Prefer sandboxed runs for untrusted inputs and risky tools."*
+
+## Key Takeaways
+
+1. **Skills are the missing layer** between raw model capability and real-world usefulness. They package domain expertise into portable, composable folders.
+
+2. **Progressive disclosure is brilliant** — it solves the context window problem by loading information only when needed, making skills effectively unlimited in size.
+
+3. **The standard is open** — write a skill once and it works across Claude.ai, Claude Code, the API, and third-party agents like OpenClaw.
+
+4. **Start with gaps, not features** — build skills by observing where your agent fails, not by guessing what it might need.
+
+5. **Skills + MCP = the full agent stack** — MCP provides the tools, Skills provide the expertise. Together, they turn general-purpose AI into specialized workers.
+
+The shift from "AI chatbot" to "AI agent with skills" is happening now. The teams that figure out how to capture their institutional knowledge into skills will have the most capable AI systems — and it's not even close.
+
+---
+
+*Building something with Agent Skills? I'd love to hear about it. The standard is open, the format is simple, and the possibilities are just getting started.*
