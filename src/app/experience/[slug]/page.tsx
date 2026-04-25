@@ -6,13 +6,6 @@ import {
   getExperienceBySlug,
   getAllExperienceSlugs,
 } from "@/lib/experiences";
-import {
-  ArrowLeft,
-  MapPin,
-  Calendar,
-  CheckCircle2,
-  Briefcase,
-} from "lucide-react";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -32,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `${experience.role} at ${experience.company}`,
+    title: `${experience.role} · ${experience.company}`,
     description: experience.description,
   };
 }
@@ -46,107 +39,104 @@ export default async function ExperiencePage({ params }: PageProps) {
   }
 
   return (
-    <Container className="py-16 sm:py-24">
-      {/* Back Button */}
+    <Container size="wide" className="pb-32 pt-14 sm:pt-20">
       <Link
-        href="/#experience"
-        className="group mb-8 inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-teal-400"
+        href="/#work"
+        className="editorial-link mb-10 inline-flex items-center gap-2 font-mono text-[11px] tracking-mono uppercase text-ink-muted"
       >
-        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-        Back to Home
+        ← Back to work
       </Link>
 
-      {/* Header */}
-      <div className="mb-12">
-        <div className="flex flex-wrap items-center gap-3 mb-4">
-          <span className="px-3 py-1 text-sm font-medium rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">
-            {experience.type}
-          </span>
-          <span className="flex items-center gap-1 text-sm text-zinc-500">
-            <Calendar className="h-4 w-4" />
-            {experience.period}
-          </span>
-        </div>
+      <header className="grid grid-cols-1 gap-8 border-b border-rule pb-12 lg:grid-cols-12">
+        <div className="lg:col-span-9">
+          <p className="mono-strip flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span>▌ {experience.type}</span>
+            <span aria-hidden className="text-ink-faint/60">·</span>
+            <span>{experience.period}</span>
+            <span aria-hidden className="text-ink-faint/60">·</span>
+            <span>{experience.location}</span>
+          </p>
 
-        <h1 className="text-4xl font-bold tracking-tight text-zinc-100 sm:text-5xl mb-4">
-          {experience.company}
-        </h1>
+          <h1
+            className="mt-6 font-display text-5xl font-semibold leading-[0.95] tracking-tight2 text-ink sm:text-6xl md:text-7xl text-balance"
+            style={{ fontVariationSettings: '"opsz" 144' }}
+          >
+            {experience.company}
+          </h1>
 
-        <div className="flex flex-wrap items-center gap-4 text-zinc-400">
-          <span className="flex items-center gap-2">
-            <Briefcase className="h-5 w-5 text-teal-400" />
+          <p className="mt-4 font-display text-xl text-ink md:text-2xl">
             {experience.role}
-          </span>
-          <span className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-teal-400" />
-            {experience.location}
-          </span>
+          </p>
+
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-muted text-pretty md:text-lg">
+            {experience.description}
+          </p>
         </div>
-      </div>
 
-      {/* Description */}
-      <div className="glass p-6 rounded-2xl mb-8">
-        <p className="text-lg text-zinc-300 leading-relaxed">
-          {experience.description}
-        </p>
-      </div>
+        <aside className="lg:col-span-3">
+          <p className="mono-strip">▌ Stack</p>
+          <ul className="mt-3 space-y-1.5 font-mono text-xs leading-relaxed text-ink">
+            {experience.technologies.map((tech) => (
+              <li key={tech} className="flex gap-2">
+                <span className="text-accent" aria-hidden>›</span>
+                <span>{tech}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      </header>
 
-      {/* Achievements Grid */}
       {experience.achievements && experience.achievements.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-zinc-100 mb-6">Key Achievements</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {experience.achievements.map((achievement, index) => (
-              <div
-                key={index}
-                className="glass p-6 rounded-xl text-center"
-              >
-                <div className="text-3xl font-bold text-teal-400 mb-2">
-                  {achievement.metric}
-                </div>
-                <div className="text-sm text-zinc-400">
-                  {achievement.description}
-                </div>
+        <section className="mt-16">
+          <p className="mono-strip">▌ Receipts</p>
+          <dl className="mt-8 grid grid-cols-2 gap-x-10 gap-y-10 sm:grid-cols-4">
+            {experience.achievements.map((a, i) => (
+              <div key={i} className="border-t border-rule-strong pt-4">
+                <dt className="font-mono text-[11px] tracking-mono uppercase text-ink-faint">
+                  Metric
+                </dt>
+                <dd
+                  className="mt-2 font-display text-4xl font-semibold leading-none tracking-tight3 text-ink md:text-5xl"
+                  style={{ fontVariationSettings: '"opsz" 96' }}
+                >
+                  {a.metric}
+                </dd>
+                <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+                  {a.description}
+                </p>
               </div>
             ))}
-          </div>
-        </div>
+          </dl>
+        </section>
       )}
 
-      {/* Highlights */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-zinc-100 mb-6">
-          What I Did
-        </h2>
-        <div className="space-y-4">
-          {experience.highlights.map((highlight, index) => (
-            <div
-              key={index}
-              className="glass p-4 rounded-xl flex gap-4"
+      <section className="mt-20">
+        <p className="mono-strip">▌ What got built</p>
+        <ol className="mt-8">
+          {experience.highlights.map((highlight, i) => (
+            <li
+              key={i}
+              className="grid grid-cols-1 gap-3 border-b border-rule py-7 md:grid-cols-12 md:gap-x-8"
             >
-              <CheckCircle2 className="h-6 w-6 text-teal-400 shrink-0 mt-0.5" />
-              <p className="text-zinc-300">{highlight}</p>
-            </div>
+              <div className="font-mono text-[11px] tracking-mono uppercase text-ink-faint md:col-span-2 md:pt-1">
+                <span className="text-accent">§</span> {String(i + 1).padStart(2, "0")}
+              </div>
+              <p className="text-lg leading-relaxed text-ink text-pretty md:col-span-10">
+                {highlight}
+              </p>
+            </li>
           ))}
-        </div>
-      </div>
+        </ol>
+      </section>
 
-      {/* Technologies */}
-      <div>
-        <h2 className="text-2xl font-bold text-zinc-100 mb-6">
-          Technologies Used
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {experience.technologies.map((tech) => (
-            <span
-              key={tech}
-              className="px-4 py-2 text-sm font-medium rounded-full bg-zinc-800/50 text-zinc-300 border border-zinc-700/50 hover:border-teal-500/50 hover:text-teal-400 transition-colors"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
+      <footer className="mt-20 border-t border-rule pt-8">
+        <Link
+          href="/#work"
+          className="editorial-link inline-flex items-center gap-2 font-mono text-[11px] tracking-mono uppercase text-ink"
+        >
+          ← All work
+        </Link>
+      </footer>
     </Container>
   );
 }

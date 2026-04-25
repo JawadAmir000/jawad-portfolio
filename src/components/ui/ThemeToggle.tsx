@@ -2,10 +2,9 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -13,20 +12,27 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return <div className="h-9 w-9" />;
+    return (
+      <span className="font-mono text-[11px] tracking-mono text-ink-faint uppercase">
+        [ light · dark ]
+      </span>
+    );
   }
+
+  const isDark = resolvedTheme === "dark";
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="rounded-full p-2 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 transition-colors"
-      aria-label="Toggle theme"
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="group font-mono text-[11px] tracking-mono uppercase text-ink-muted hover:text-ink transition-colors"
+      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
     >
-      {theme === "dark" ? (
-        <Sun className="h-5 w-5" />
-      ) : (
-        <Moon className="h-5 w-5" />
-      )}
+      <span className="opacity-50">[ </span>
+      <span className={isDark ? "opacity-50" : "text-accent"}>light</span>
+      <span className="opacity-50"> · </span>
+      <span className={isDark ? "text-accent" : "opacity-50"}>dark</span>
+      <span className="opacity-50"> ]</span>
     </button>
   );
 }

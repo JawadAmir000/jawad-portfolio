@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Github } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { getProjectBySlug, getProjects } from "@/lib/projects";
 
@@ -37,93 +36,107 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   }
 
   return (
-    <Container className="py-16 sm:py-24">
+    <Container size="wide" className="pb-32 pt-14 sm:pt-20">
       <Link
         href="/portfolio"
-        className="group mb-8 inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-teal-500 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors"
+        className="editorial-link mb-10 inline-flex items-center gap-2 font-mono text-[11px] tracking-mono uppercase text-ink-muted"
       >
-        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-        Back to portfolio
+        ← Back to work
       </Link>
 
       <article>
-        <header className="mb-12">
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            {project.company && (
-              <span className="rounded-full bg-teal-500/10 px-3 py-1 text-sm font-medium text-teal-500">
-                {project.company}
-              </span>
-            )}
-            {project.role && (
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                {project.role}
-              </span>
-            )}
+        <header className="grid grid-cols-1 gap-8 border-b border-rule pb-10 lg:grid-cols-12">
+          <div className="lg:col-span-9">
+            <p className="mono-strip flex flex-wrap items-center gap-x-3 gap-y-1">
+              {project.company && <span>▌ {project.company}</span>}
+              {project.role && (
+                <>
+                  <span aria-hidden className="text-ink-faint/60">·</span>
+                  <span>{project.role}</span>
+                </>
+              )}
+            </p>
+
+            <h1
+              className="mt-6 font-display text-5xl font-semibold leading-[0.95] tracking-tight2 text-ink sm:text-6xl md:text-7xl text-balance"
+              style={{ fontVariationSettings: '"opsz" 144' }}
+            >
+              {project.title}
+            </h1>
+
+            <p className="mt-6 max-w-2xl font-display text-xl leading-[1.4] text-ink-muted text-pretty md:text-2xl">
+              {project.longDescription || project.description}
+            </p>
           </div>
 
-          <h1 className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
-            {project.title}
-          </h1>
-
-          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
-            {project.longDescription || project.description}
-          </p>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-6 flex gap-4">
-            {project.github && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors"
-              >
-                <Github className="h-4 w-4" />
-                View Code
-              </a>
-            )}
-            {project.live && (
-              <a
-                href={project.live}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-colors"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Live Demo
-              </a>
-            )}
-          </div>
-        </header>
-
-        {project.highlights && project.highlights.length > 0 && (
-          <section className="mb-12">
-            <h2 className="mb-6 text-2xl font-bold text-zinc-800 dark:text-zinc-100">
-              Key Highlights
-            </h2>
-            <ul className="space-y-4">
-              {project.highlights.map((highlight, index) => (
-                <li key={index} className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-teal-500" />
-                  <span className="text-zinc-600 dark:text-zinc-400">
-                    {highlight}
-                  </span>
+          <aside className="lg:col-span-3">
+            <p className="mono-strip">▌ Stack</p>
+            <ul className="mt-3 space-y-1.5 font-mono text-xs leading-relaxed text-ink">
+              {project.tags.map((tag) => (
+                <li key={tag} className="flex gap-2">
+                  <span className="text-accent" aria-hidden>›</span>
+                  <span>{tag}</span>
                 </li>
               ))}
             </ul>
+
+            {(project.github || project.live) && (
+              <div className="mt-6 flex flex-col gap-2">
+                {project.github && (
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[11px] tracking-mono uppercase border border-ink px-4 py-2 text-ink transition-colors hover:bg-ink hover:text-bg text-center"
+                  >
+                    Source ↗
+                  </a>
+                )}
+                {project.live && (
+                  <a
+                    href={project.live}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[11px] tracking-mono uppercase border border-accent px-4 py-2 text-accent transition-colors hover:bg-accent hover:text-bg text-center"
+                  >
+                    Live ↗
+                  </a>
+                )}
+              </div>
+            )}
+          </aside>
+        </header>
+
+        {project.highlights && project.highlights.length > 0 && (
+          <section className="mt-16">
+            <p className="mono-strip">▌ Field notes · what shipped</p>
+            <ol className="mt-8 grid grid-cols-1 gap-y-0">
+              {project.highlights.map((highlight, i) => (
+                <li
+                  key={i}
+                  className="grid grid-cols-1 gap-3 border-b border-rule py-6 md:grid-cols-12 md:gap-x-8"
+                >
+                  <div className="font-mono text-[11px] tracking-mono uppercase text-ink-faint md:col-span-2 md:pt-1">
+                    № {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <p className="text-lg leading-relaxed text-ink text-pretty md:col-span-10">
+                    {highlight}
+                  </p>
+                </li>
+              ))}
+            </ol>
           </section>
         )}
       </article>
+
+      <footer className="mt-20 border-t border-rule pt-8">
+        <Link
+          href="/portfolio"
+          className="editorial-link inline-flex items-center gap-2 font-mono text-[11px] tracking-mono uppercase text-ink"
+        >
+          ← All work
+        </Link>
+      </footer>
     </Container>
   );
 }

@@ -1,62 +1,103 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ExternalLink, Github } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { getProjects } from "@/lib/projects";
-import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Portfolio",
+  title: "Work",
   description:
-    "Featured projects and case studies in AI, cloud architecture, and enterprise software.",
+    "Selected projects and case studies — AI, cloud architecture, and enterprise software.",
 };
 
 export default async function PortfolioPage() {
   const projects = await getProjects();
-  const featuredProjects = projects.filter((p) => p.featured);
-  const otherProjects = projects.filter((p) => !p.featured);
+  const featured = projects.filter((p) => p.featured);
+  const other = projects.filter((p) => !p.featured);
 
   return (
-    <Container className="py-16 sm:py-24">
-      <header className="mb-16">
-        <h1 className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
-          Portfolio
-        </h1>
-        <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
-          A collection of projects I&apos;ve built across AI, cloud
-          architecture, and enterprise software development. From Fortune 500
-          healthcare platforms to innovative AI startups.
-        </p>
+    <Container size="wide" className="pb-24 pt-14 sm:pt-20">
+      <header className="mb-16 grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-9">
+          <p className="mono-strip">§ 02 / Work · {projects.length} entries</p>
+          <h1
+            className="mt-4 font-display font-semibold leading-[0.95] tracking-tight2 text-ink text-[clamp(2.5rem,7.5vw,5.25rem)]"
+            style={{ fontVariationSettings: '"opsz" 96' }}
+          >
+            Work<span className="text-accent">.</span>
+          </h1>
+        </div>
+        <div className="lg:col-span-12">
+          <p className="max-w-3xl font-display text-2xl leading-[1.2] tracking-tight2 text-ink-muted text-pretty md:text-3xl">
+            A working dossier of shipped systems — from Fortune-500 healthcare
+            pipelines to a co-founded multi-agent platform. Selected for what
+            they taught, not what they sold.
+          </p>
+        </div>
       </header>
 
-      <section className="mb-16">
-        <h2 className="mb-8 text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">
-          Featured Projects
+      <section className="mb-20">
+        <h2 className="mono-strip mb-8 border-b border-rule pb-3">
+          ▌ Featured · {featured.length}
         </h2>
-        <div className="grid gap-8 md:grid-cols-2">
-          {featuredProjects.map((project) => (
-            <ProjectCard key={project.slug} project={project} featured />
+        <ol className="grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-12">
+          {featured.map((p, i) => (
+            <ProjectEntry key={p.slug} project={p} index={i} variant="featured" />
           ))}
-        </div>
+        </ol>
       </section>
 
-      {otherProjects.length > 0 && (
+      {other.length > 0 && (
         <section>
-          <h2 className="mb-8 text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">
-            Other Projects
+          <h2 className="mono-strip mb-8 border-b border-rule pb-3">
+            ▌ Archive · {other.length}
           </h2>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {otherProjects.map((project) => (
-              <ProjectCard key={project.slug} project={project} />
+          <ol className="border-t border-rule">
+            {other.map((p, i) => (
+              <li key={p.slug} className="group border-b border-rule">
+                <Link
+                  href={`/portfolio/${p.slug}`}
+                  className="grid grid-cols-1 gap-3 py-7 md:grid-cols-12 md:gap-x-8"
+                >
+                  <div className="font-mono text-[11px] tracking-mono uppercase text-ink-faint md:col-span-2 md:pt-2">
+                    № {String(featured.length + i + 1).padStart(2, "0")}
+                  </div>
+                  <div className="md:col-span-7">
+                    <h3 className="font-display text-2xl font-semibold leading-[1.15] tracking-tight2 text-ink md:text-3xl">
+                      <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-no-repeat bg-[position:0_100%] transition-[background-size] duration-500 group-hover:bg-[length:100%_1px]">
+                        {p.title}
+                      </span>
+                    </h3>
+                    <p className="mt-3 text-base leading-relaxed text-ink-muted text-pretty">
+                      {p.description}
+                    </p>
+                  </div>
+                  <div className="md:col-span-3 md:pt-2">
+                    <div className="flex flex-wrap gap-1.5">
+                      {p.tags.slice(0, 4).map((t) => (
+                        <span
+                          key={t}
+                          className="font-mono text-[10px] tracking-mono uppercase border border-current/40 px-2 py-0.5"
+                          style={{ color: "var(--indigo)" }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                    <span className="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-mono uppercase text-ink transition-colors group-hover:text-accent">
+                      Open file →
+                    </span>
+                  </div>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
       )}
     </Container>
   );
 }
 
-interface ProjectCardProps {
+interface ProjectEntryProps {
   project: {
     slug: string;
     title: string;
@@ -66,87 +107,60 @@ interface ProjectCardProps {
     role?: string;
     github?: string;
     live?: string;
+    highlights?: string[];
   };
-  featured?: boolean;
+  index: number;
+  variant?: "featured" | "default";
 }
 
-function ProjectCard({ project, featured = false }: ProjectCardProps) {
+function ProjectEntry({ project, index }: ProjectEntryProps) {
   return (
-    <article
-      className={cn(
-        "group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white transition hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700",
-        featured && "md:col-span-1"
-      )}
-    >
-      <div className="flex flex-1 flex-col p-6">
-        <div className="mb-2 flex items-center gap-2">
+    <li className="group">
+      <Link href={`/portfolio/${project.slug}`}>
+        <p className="font-mono text-[11px] tracking-mono uppercase text-ink-faint">
+          № {String(index + 1).padStart(2, "0")}
           {project.company && (
-            <span className="text-xs font-medium text-teal-500">
-              {project.company}
-            </span>
-          )}
-          {project.role && (
             <>
-              <span className="text-zinc-300 dark:text-zinc-700">•</span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                {project.role}
-              </span>
+              {" · "}
+              <span className="text-ink-muted">{project.company}</span>
             </>
           )}
-        </div>
-
-        <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
-          <Link href={`/portfolio/${project.slug}`}>
-            <span className="absolute inset-0 z-10" />
+        </p>
+        <h3 className="mt-3 font-display text-3xl font-semibold leading-[1.05] tracking-tight2 text-ink md:text-4xl">
+          <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-no-repeat bg-[position:0_100%] transition-[background-size] duration-500 group-hover:bg-[length:100%_1px]">
             {project.title}
-          </Link>
+          </span>
         </h3>
-
-        <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-4 text-base leading-relaxed text-ink-muted text-pretty">
           {project.description}
         </p>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {project.tags.slice(0, 4).map((tag) => (
+        {project.highlights && project.highlights.length > 0 && (
+          <ul className="mt-5 space-y-2 border-l border-rule-strong pl-4">
+            {project.highlights.slice(0, 2).map((h) => (
+              <li
+                key={h}
+                className="font-mono text-xs leading-relaxed text-ink-muted"
+              >
+                <span className="text-accent">↳</span> {h}
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="mt-5 flex flex-wrap gap-1.5">
+          {project.tags.slice(0, 5).map((t) => (
             <span
-              key={tag}
-              className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+              key={t}
+              className="font-mono text-[10px] tracking-mono uppercase border border-current/40 px-2 py-0.5"
+              style={{ color: "var(--indigo)" }}
             >
-              {tag}
+              {t}
             </span>
           ))}
-          {project.tags.length > 4 && (
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">
-              +{project.tags.length - 4} more
-            </span>
-          )}
         </div>
-
-        <div className="mt-4 flex items-center gap-4 border-t border-zinc-100 pt-4 dark:border-zinc-800">
-          {project.github && (
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative z-20 inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-teal-500 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors"
-            >
-              <Github className="h-4 w-4" />
-              Code
-            </a>
-          )}
-          {project.live && (
-            <a
-              href={project.live}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative z-20 inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-teal-500 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Live
-            </a>
-          )}
-        </div>
-      </div>
-    </article>
+        <span className="mt-6 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-mono uppercase text-ink transition-colors group-hover:text-accent">
+          Open case file →
+        </span>
+      </Link>
+    </li>
   );
 }

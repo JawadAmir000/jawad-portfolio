@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Fraunces } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { NoiseOverlay } from "@/components/visual/NoiseOverlay";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -17,13 +19,21 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  axes: ["opsz"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
-    default: "Jawad Amir - Senior Software Engineer & AI Specialist",
-    template: "%s | Jawad Amir",
+    default: "Jawad Amir — Senior Software Engineer & AI Innovation Specialist",
+    template: "%s · Jawad Amir",
   },
   description:
-    "Senior Software Engineer with 6+ years of experience in .NET, Cloud Architecture, and AI Innovation. Building high-performance, cloud-native, and AI-driven solutions.",
+    "Editorial portfolio of Jawad Amir — engineer working at the intersection of .NET, cloud architecture, and AI agents. Selected work, writing, and a long-running build log.",
   keywords: [
     "Software Engineer",
     "AI",
@@ -32,7 +42,8 @@ export const metadata: Metadata = {
     "AWS",
     "Microservices",
     "Cloud Architecture",
-    "Full Stack Developer",
+    "RAG",
+    "Agents",
   ],
   authors: [{ name: "Jawad Amir" }],
   creator: "Jawad Amir",
@@ -40,16 +51,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://jawadamir000.github.io/jawad-portfolio",
-    title: "Jawad Amir - Senior Software Engineer & AI Specialist",
+    title: "Jawad Amir — Senior Software Engineer & AI Innovation Specialist",
     description:
-      "Building high-performance, cloud-native, and AI-driven solutions across Fortune 500 enterprises and startups.",
+      "Editorial portfolio. Engineer working at the intersection of .NET, cloud architecture, and AI agents.",
     siteName: "Jawad Amir",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jawad Amir - Senior Software Engineer & AI Specialist",
+    title: "Jawad Amir — Senior Software Engineer & AI Innovation Specialist",
     description:
-      "Building high-performance, cloud-native, and AI-driven solutions",
+      "Editorial portfolio. Engineer working at the intersection of .NET, cloud architecture, and AI agents.",
   },
   robots: {
     index: true,
@@ -65,21 +76,18 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased scanlines`}
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
-          {/* Animated background */}
-          <div className="fixed inset-0 -z-10 animated-gradient-bg" />
-          <div className="fixed inset-0 -z-10 grid-pattern opacity-50" />
-
+          <NoiseOverlay />
           <div className="relative flex min-h-screen flex-col">
             <Header />
-            <main className="flex-1 pt-24">{children}</main>
+            <main className="flex-1">{children}</main>
             <Footer />
           </div>
         </ThemeProvider>

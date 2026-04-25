@@ -3,109 +3,111 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Container } from "./Container";
-import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { Container } from "./Container";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navItems = [
-  { href: "/", label: "Home" },
-  { href: "/articles", label: "Articles" },
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/about", label: "About" },
+  { href: "/", label: "Index", number: "00" },
+  { href: "/articles", label: "Writing", number: "01" },
+  { href: "/portfolio", label: "Work", number: "02" },
+  { href: "/about", label: "Bio", number: "03" },
 ];
 
 export function Header() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const isActive = (href: string) =>
+    pathname === href || (href !== "/" && pathname?.startsWith(href));
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="fixed top-0 left-0 right-0 z-50 pt-4"
-    >
-      <Container>
-        <nav className="glass rounded-2xl px-6 flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="relative group">
-            <span className="text-xl font-bold text-zinc-100 group-hover:text-teal-400 transition-colors">
+    <header className="sticky top-0 z-40 border-b border-rule bg-bg/85 backdrop-blur-md">
+      <Container size="wide">
+        <div className="flex h-14 items-center justify-between gap-6">
+          <Link href="/" className="group flex items-baseline gap-3">
+            <span className="font-mono text-[11px] tracking-mono uppercase text-ink-faint">
+              §
+            </span>
+            <span className="font-display text-lg font-semibold tracking-tight2 text-ink transition-colors group-hover:text-accent">
               Jawad Amir
+            </span>
+            <span className="hidden font-mono text-[11px] tracking-mono uppercase text-ink-faint sm:inline">
+              · Operator
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <nav className="hidden items-center gap-1 md:flex">
             {navItems.map((item) => {
-              const isActive = pathname === item.href ||
-                (item.href !== "/" && pathname?.startsWith(item.href));
-
+              const active = isActive(item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? "text-teal-400"
-                      : "text-zinc-400 hover:text-zinc-100"
-                  }`}
+                  className="group relative px-3 py-1 font-mono text-[11px] tracking-mono uppercase"
                 >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNav"
-                      className="absolute inset-0 bg-teal-500/10 rounded-lg border border-teal-500/20"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  <span className="mr-1.5 text-ink-faint">{item.number}</span>
+                  <span className={active ? "text-ink" : "text-ink-muted group-hover:text-ink transition-colors"}>
+                    {item.label}
+                  </span>
+                  {active && (
+                    <motion.span
+                      layoutId="navUnderline"
+                      className="absolute left-3 right-3 -bottom-[15px] h-px bg-accent"
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
                     />
                   )}
-                  <span className="relative z-10">{item.label}</span>
                 </Link>
               );
             })}
+          </nav>
+
+          <div className="hidden items-center gap-4 md:flex">
+            <ThemeToggle />
           </div>
 
-          {/* Mobile Menu Button */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors"
+            onClick={() => setOpen(!open)}
+            className="md:hidden p-1.5 text-ink"
+            aria-label="Toggle navigation"
           >
-            {mobileMenuOpen ? (
-              <X className="w-5 h-5 text-zinc-100" />
-            ) : (
-              <Menu className="w-5 h-5 text-zinc-100" />
-            )}
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-        </nav>
-
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="md:hidden glass rounded-2xl p-4 mt-2"
-          >
-            {navItems.map((item) => {
-              const isActive = pathname === item.href ||
-                (item.href !== "/" && pathname?.startsWith(item.href));
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-teal-500/10 text-teal-400"
-                      : "text-zinc-400 hover:text-zinc-100 hover:bg-white/5"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </motion.div>
-        )}
+        </div>
       </Container>
-    </motion.header>
+
+      {open && (
+        <motion.nav
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="border-t border-rule bg-bg md:hidden"
+        >
+          <Container size="wide">
+            <div className="flex flex-col py-4">
+              {navItems.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="flex items-baseline gap-3 py-2.5 font-mono text-xs tracking-mono uppercase"
+                  >
+                    <span className="text-ink-faint">{item.number}</span>
+                    <span className={active ? "text-accent" : "text-ink"}>
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })}
+              <div className="mt-3 border-t border-rule pt-4">
+                <ThemeToggle />
+              </div>
+            </div>
+          </Container>
+        </motion.nav>
+      )}
+    </header>
   );
 }
