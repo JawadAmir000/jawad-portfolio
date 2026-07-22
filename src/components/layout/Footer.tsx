@@ -10,56 +10,56 @@ const social = [
 ];
 
 const nav = [
-  { href: "/articles", label: "Writing" },
   { href: "/portfolio", label: "Work" },
-  { href: "/about", label: "Bio" },
+  { href: "/articles", label: "Writing" },
+  { href: "/about", label: "About" },
 ];
 
 export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-32 border-t border-rule">
+    <footer className="border-t border-rule">
       <Container size="wide">
-        <div className="grid grid-cols-1 gap-10 py-14 md:grid-cols-12">
-          <div className="md:col-span-7">
-            <p className="font-mono text-[11px] tracking-mono uppercase text-ink-faint">
-              § End · Colophon
-            </p>
-            <p
-              className="mt-5 max-w-xl font-display leading-[1.22] tracking-tight2 text-ink text-pretty text-[clamp(1.35rem,2.4vw,1.85rem)]"
-              style={{ fontVariationSettings: '"opsz" 32' }}
-            >
-              A <span className="italic">field journal</span> on agentic
-              systems and the cloud platforms underneath — written, set, and
-              operated from <span className="italic text-accent">Dhaka, Bangladesh</span>.
-            </p>
-            <p className="mt-5 max-w-md font-mono text-[11px] leading-relaxed tracking-mono uppercase text-ink-muted">
-              ↳ Type set in Fraunces (display) &amp; Geist (text). Open to
-              select advisory and contract work in agentic AI &amp; cloud
-              architecture —{" "}
-              <a
-                href="mailto:xawadamir0@gmail.com"
-                className="editorial-link text-ink"
+        <div className="grid grid-cols-1 gap-12 py-16 md:grid-cols-12">
+          <div className="md:col-span-6">
+            <div className="flex items-center gap-2.5">
+              <span
+                aria-hidden
+                className="grid h-7 w-7 place-items-center rounded-lg bg-ink text-bg font-display text-sm font-bold"
               >
-                say hello
-              </a>
-              .
+                J
+              </span>
+              <span className="font-display text-[15px] font-semibold tracking-tight2 text-ink">
+                Jawad Amir
+              </span>
+            </div>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-ink-muted text-pretty">
+              Senior software engineer building production AI agents and the
+              cloud platforms underneath — currently on agentic analytics,
+              working remotely from Dhaka, Bangladesh.
             </p>
+            <a
+              href="mailto:xawadamir0@gmail.com"
+              className="btn btn-primary mt-6"
+            >
+              Start a conversation
+              <span aria-hidden className="arrow">
+                →
+              </span>
+            </a>
           </div>
 
-          <div className="md:col-span-2">
-            <p className="font-mono text-[11px] tracking-mono uppercase text-ink-faint">
-              Index
-            </p>
-            <ul className="mt-4 space-y-2">
+          <div className="md:col-span-3">
+            <p className="mono-strip">Pages</p>
+            <ul className="mt-4 space-y-2.5">
               {nav.map(({ href, label }) => (
                 <li key={href}>
                   <Link
                     href={href}
-                    className="editorial-link text-base text-ink"
+                    className="text-sm text-ink-muted transition-colors hover:text-ink"
                   >
-                    {label} →
+                    {label}
                   </Link>
                 </li>
               ))}
@@ -67,19 +67,20 @@ export function Footer() {
           </div>
 
           <div className="md:col-span-3">
-            <p className="font-mono text-[11px] tracking-mono uppercase text-ink-faint">
-              Channels
-            </p>
-            <ul className="mt-4 space-y-2">
+            <p className="mono-strip">Elsewhere</p>
+            <ul className="mt-4 space-y-2.5">
               {social.map(({ href, label }) => (
                 <li key={href}>
                   <a
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="editorial-link text-base text-ink"
+                    className="inline-flex items-center gap-1 text-sm text-ink-muted transition-colors hover:text-ink"
                   >
-                    {label} ↗
+                    {label}
+                    <span aria-hidden className="text-ink-faint">
+                      ↗
+                    </span>
                   </a>
                 </li>
               ))}
@@ -87,14 +88,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-rule py-6 font-mono text-[11px] tracking-mono uppercase text-ink-faint sm:flex-row sm:items-center sm:justify-between">
-          <span>
-            © {year} · Jawad Amir · Vol. {year - 2018}, № 01
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="text-accent">▌</span>
-            <span>Built with care · No rights reserved</span>
-          </span>
+        <div className="flex flex-col gap-2 border-t border-rule py-6 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between">
+          <span>© {year} Jawad Amir. All rights reserved.</span>
+          <span>Built with Next.js &amp; Tailwind CSS.</span>
         </div>
       </Container>
     </footer>

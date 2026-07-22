@@ -1,0 +1,170 @@
+---
+title: "How We Evaluate Our Agentic Systems: Evals, Evalite, and Humans in the Loop"
+description: "Shipping a multi-agent system on vibes is a great way to break production. Here's how we made a probabilistic analytics agent measurable — with Evalite, layered scorers, and human review that actually feeds back into the loop."
+date: "2026-07-23"
+tags: ["AI", "Evals", "Agentic AI", "Evalite", "LLM", "Claude", "Testing"]
+featured: true
+---
+
+There's a moment every AI engineer hits eventually. You've built an agent. It works — beautifully — in the three demos you tried. You tweak a prompt to fix one edge case, ship it, and something *completely unrelated* breaks in production. A chart that used to render now returns nonsense. A query that used to route correctly now goes to the wrong agent.
+
+You changed one line. How do you know if the system got 5% better or 50% worse?
+
+You don't. Not unless you have **evals**.
+
+When we were building the multi-agent analytics platform at **Anlytic** — the one that turns plain-English questions into live dashboards on top of Anthropic Claude and the Vercel AI SDK — this was the wall we hit. A single agent you can eyeball. A *router* handing off to chart-generation, dashboard-editing, data-management, and general-analytics agents, each calling tools, each able to mutate real user data? You cannot eyeball that. So we stopped trying, and we built an evaluation harness instead.
+
+This is how it works.
+
+## Evals are the AI engineer's unit tests
+
+Here's the mental model that unlocked it for me: **evals are unit tests for probabilistic systems.** They're how you wrangle predictability out of something that is, by design, non-deterministic.
+
+But there's a crucial difference from the tests you already write. Traditional tests are binary — pass or fail. That model falls apart the moment your output is qualitative. Is this chart *the right answer* to the user's question? Is this summary *faithful* to the data? "Pass/fail" can't capture "80% of the way there."
+
+So evals score on a scale — **0 to 100** — instead of a green checkmark. That number is the whole point. Every time you change a prompt, swap a model, or refactor a tool, you get a delta: this made routing 4 points better, but chart accuracy dropped 11. Now you're engineering, not guessing.
+
+## Why we reached for Evalite
+
+There are a lot of eval tools now. We chose [**Evalite**](https://www.evalite.dev/what-is-evalite) — Matt Pocock's TypeScript-native, local-first eval runner — for reasons that were almost boringly practical:
+
+- **It's built on Vitest.** Our stack is TypeScript end to end. Evalite runs `*.eval.ts` files through Vitest, which means the same test ergonomics we already know — mocks, lifecycle hooks, watch mode — apply to evals. No new mental model.
+- **It's local-first.** Evals run on our machine. Our data — including real, sensitive analytics queries — never leaves it. For a product that touches customer databases, that's non-negotiable.
+- **The trace UI is excellent.** It spins up a local dev server with live reload, so you can watch a score move as you edit a prompt, and click into any single case to see the full model trace: what went in, what tools got called, what came out.
+
+An Evalite eval has three parts, and that's the entire surface area:
+
+```typescript
+import { evalite } from "evalite";
+import { Levenshtein } from "autoevals";
+
+evalite("My Eval", {
+  // 1. The dataset: inputs paired with what you expected
+  data: async () => [
+    { input: "Hello", expected: "Hello World!" },
+  ],
+  // 2. The task: the thing you're actually testing
+  task: async (input) => {
+    return input + " World!";
+  },
+  // 3. The scorers: how you grade the output, 0–100
+  scorers: [Levenshtein],
+});
+```
+
+`data`, `task`, `scorers`. Once you see it, you see it everywhere.
+
+## Layer 1: our first real eval was the router
+
+The single most important decision our system makes is the *first* one: a fast **Claude Haiku classifier** reads the user's message and routes it to the right specialised agent. If routing is wrong, everything downstream is wrong — cheaply and confidently wrong, which is the worst kind.
+
+So that was eval number one. The task is the router; the dataset is real queries labelled with the agent that *should* handle them:
+
+```typescript
+import { evalite } from "evalite";
+import { routeQuery } from "@/agents/router";
+
+evalite("Router picks the right agent", {
+  data: async () => [
+    { input: "show revenue by month as a line chart", expected: "chart" },
+    { input: "delete the 2023 rows from the sales table", expected: "data" },
+    { input: "rename this dashboard to Q3 Review", expected: "dashboard" },
+    { input: "what's driving the dip in July?", expected: "analytics" },
+  ],
+  task: async (input) => routeQuery(input), // returns the chosen agent
+  scorers: [ExactMatch],
+});
+```
+
+The scorer here is deterministic — the routing label either matches or it doesn't, so a custom **code-based scorer** is exactly right:
+
+```typescript
+const ExactMatch = {
+  name: "Exact match",
+  scorer: ({ output, expected }) => (output === expected ? 1 : 0),
+};
+```
+
+This is the first of the three kinds of scorers we lean on, and the cheapest: **deterministic checks.** Did the chart agent emit *valid* config? Is the generated visualization one of our eight supported types? Did the SQL parse? These are objective, they're free to run, and they catch a shocking number of regressions. Never reach for an LLM to check something a function can check.
+
+## Layer 2: LLM-as-judge, for the questions code can't answer
+
+Deterministic scorers can tell you the chart config is *valid*. They can't tell you it's the *right chart for the question*. "Show me revenue trends" should probably be a line chart, not a pie. That's a judgment call — so we hand it to a judge.
+
+This is the **LLM-as-a-judge** pattern: you pass the output, plus the input and any ground truth, to *another* model and ask it to grade against a rubric. `autoevals` (which ships with Evalite) has ready-made judges like `Factuality`, and you can write your own:
+
+```typescript
+import { evalite } from "evalite";
+import { generateChart } from "@/agents/chart";
+import { ChartAnswersTheQuestion } from "@/scorers/judge";
+
+evalite("Chart agent answers the question asked", {
+  data: async () => loadCases("chart-golden-set.json"),
+  task: async (input) => generateChart(input),
+  scorers: [ValidChartConfig, ChartAnswersTheQuestion],
+});
+```
+
+The judge scorer wraps a small, cheap Claude call with a tightly-scoped rubric — *does this visualization actually answer the user's question, given the data?* — and returns a normalized score with its reasoning attached, so a low score is never a mystery.
+
+A word of hard-won caution: **LLM judges are powerful and expensive.** Running a model to grade a model adds up fast, and judges have their own biases. We run the cheap deterministic layer on every change, and reserve the judge layer for the golden sets and pre-release runs. Match the cadence to the cost.
+
+## Layer 3: the humans — and this is where it gets interesting
+
+No eval suite is complete without people. Human review is expensive and slow, but it's the ground truth every automated scorer is ultimately trying to approximate. The trick is to **stop treating human review as a separate chore and wire it into the product itself.**
+
+We got this partly for free, because of a design decision we'd already made for safety. Our agents can propose destructive operations — schema changes, row edits, table deletions — but **none of them run without explicit user sign-off.** Every destructive action is gated behind a human-in-the-loop approval step.
+
+Once you have evals in your head, you realize that approval gate is a *continuous stream of labelled human judgments.* Every time a user approves a proposed change, that's a positive label. Every time they reject one, that's a failure case — a real, in-production example of the agent getting it wrong, handed to you for free by the person best qualified to judge.
+
+So we close the loop:
+
+1. A rejected proposal gets captured (input, the agent's action, the rejection).
+2. It becomes a new case in the eval dataset.
+3. We fix the prompt or the tool.
+4. The suite proves the fix works — and, just as importantly, proves it didn't break anything else.
+
+> The best data for your evals comes from your users. A human-in-the-loop gate isn't just a safety feature — it's the highest-quality labelling pipeline you'll ever have. Don't let those signals evaporate.
+
+This is the **data flywheel**, and it's the difference between a system that's tested once and a system that gets measurably better every week it's in production.
+
+## Evals in CI: no merge without a score
+
+The suite only matters if it's a gate. Because Evalite is just Vitest, wiring it into CI was trivial. Every pull request that touches a prompt, a tool, or a model version runs the eval suite, and we hold merges to a threshold:
+
+```json
+{
+  "scripts": {
+    "eval": "evalite run",
+    "eval:watch": "evalite watch"
+  }
+}
+```
+
+If routing accuracy drops below our floor, the PR is red. Nobody has to *remember* to check. The regression that used to ship silently and surface as a confused support ticket three days later now surfaces in code review, with a trace you can click into.
+
+## The eval that saved our cost-reduction work
+
+Here's the one that made me a believer. We cut LLM API costs on the platform by **60–70%**, using a dual compression system — stripping tool-schema descriptions before sending to Claude, and summarising old tool-call results in the message history. Aggressive stuff. The obvious risk: compress too hard and you quietly degrade the model's answers.
+
+Without evals, "did compression hurt quality?" is a vibe. *With* evals, it's a number. We ran the full quality suite — routing, chart correctness, factuality — against both the compressed and uncompressed pipelines and compared the scores directly. The cost dropped 60–70%; the quality scores held. That comparison is the only reason we shipped it with confidence instead of crossing our fingers.
+
+**Evals don't just protect quality. They give you permission to be aggressive on cost, latency, and architecture — because you can prove what your optimization did.**
+
+## What I'd tell you to do on Monday
+
+If you're building anything agentic and you don't have evals yet, you don't need a platform or a big rewrite. You need to start:
+
+- **Pick your riskiest decision and eval that first.** For us it was routing. Ten labelled cases beat zero.
+- **Start with deterministic scorers.** Valid output, correct type, parseable result. Cheap, objective, high-catch.
+- **Add an LLM judge only where code can't decide** — and run it at a cadence you can afford.
+- **Turn every production failure and every human rejection into a new case.** This is the whole game.
+- **Make it a CI gate.** An eval you have to remember to run is an eval you won't run.
+
+Agents are probabilistic. That's the source of their power *and* their danger. Evals are how you keep the power and manage the danger — how you turn "it seemed to work" into "it scored 92, up from 88." With Evalite doing the plumbing, layered scorers doing the grading, and real humans in the loop feeding the flywheel, evaluation stops being an afterthought and becomes the thing everything else revolves around.
+
+That's not overhead. That's the job.
+
+---
+
+*Building agentic systems and wrestling with how to evaluate them? I'd genuinely love to compare notes — [reach out](mailto:xawadamir0@gmail.com).*

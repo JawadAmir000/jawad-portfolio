@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Fraunces } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -19,11 +19,10 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-const fraunces = Fraunces({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  axes: ["opsz"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-space",
   display: "swap",
 });
 
@@ -33,7 +32,7 @@ export const metadata: Metadata = {
     template: "%s · Jawad Amir",
   },
   description:
-    "Editorial portfolio of Jawad Amir — engineer working at the intersection of .NET, cloud architecture, and AI agents. Selected work, writing, and a long-running build log.",
+    "Jawad Amir — senior software engineer building production AI agents and cloud platforms. Six years across fintech, healthcare, and agentic analytics. Selected work, writing, and ways to get in touch.",
   keywords: [
     "Software Engineer",
     "AI",
@@ -53,14 +52,14 @@ export const metadata: Metadata = {
     url: "https://jawadamir000.github.io/jawad-portfolio",
     title: "Jawad Amir — Senior Software Engineer & AI Innovation Specialist",
     description:
-      "Editorial portfolio. Engineer working at the intersection of .NET, cloud architecture, and AI agents.",
+      "Senior software engineer building production AI agents and cloud platforms — fintech, healthcare, and agentic analytics.",
     siteName: "Jawad Amir",
   },
   twitter: {
     card: "summary_large_image",
     title: "Jawad Amir — Senior Software Engineer & AI Innovation Specialist",
     description:
-      "Editorial portfolio. Engineer working at the intersection of .NET, cloud architecture, and AI agents.",
+      "Senior software engineer building production AI agents and cloud platforms — fintech, healthcare, and agentic analytics.",
   },
   robots: {
     index: true,
@@ -76,7 +75,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased scanlines`}
+        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} antialiased`}
       >
         <ThemeProvider
           attribute="class"

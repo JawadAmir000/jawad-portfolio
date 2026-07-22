@@ -200,6 +200,8 @@ export default function AboutPage() {
                 sizes="(min-width: 1024px) 30vw, 80vw"
                 className="object-cover object-top grayscale [filter:grayscale(1)_contrast(1.05)]"
                 priority
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAKAAoDASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAQMFBv/EACAQAAECBQUAAAAAAAAAAAAAAAEAAgMEESFBFBUiUVL/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAv/EABkRAQACAwAAAAAAAAAAAAAAAAEAIQIDEf/aAAwDAQACEQMRAD8AyEaU5WFHHCO1zHlNiE6tl8qnU9lQ7HEORTc//9k="
               />
             </div>
             <p className="mt-4 font-mono text-[11px] tracking-mono uppercase leading-relaxed text-ink-muted">

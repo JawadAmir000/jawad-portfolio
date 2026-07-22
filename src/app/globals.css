@@ -4,35 +4,37 @@
 
 @layer base {
   :root {
-    /* Editorial — Bone paper, Ink black, Vermilion accent */
-    --bg: #f2eee6;
-    --bg-soft: #ece7dc;
-    --ink: #0e0e12;
-    --ink-muted: #3f3f46;
-    --ink-faint: #71717a;
-    --rule: rgba(14, 14, 18, 0.12);
-    --rule-strong: rgba(14, 14, 18, 0.24);
-    --accent: #ff4a1c;
-    --accent-ink: #f2eee6;
-    --indigo: #2b2eff;
-    --noise-blend: multiply;
+    /* Signal — warm-neutral canvas, near-ink text, electric-indigo accent */
+    --bg: #f7f6f3;
+    --bg-soft: #ffffff;
+    --surface: #ffffff;
+    --ink: #16171b;
+    --ink-muted: #55565d;
+    --ink-faint: #8b8c93;
+    --rule: rgba(22, 23, 27, 0.09);
+    --rule-strong: rgba(22, 23, 27, 0.16);
+    --accent: #3d3af5;
+    --accent-soft: rgba(61, 58, 245, 0.1);
+    --accent-ink: #ffffff;
+    --indigo: var(--accent);
 
     color-scheme: light;
   }
 
   .dark {
-    /* Operator console — Ink charcoal, Paper text, Phosphor accent */
-    --bg: #0e0e12;
-    --bg-soft: #16161c;
-    --ink: #e8e6df;
-    --ink-muted: #a1a1aa;
-    --ink-faint: #71717a;
-    --rule: rgba(232, 230, 223, 0.14);
-    --rule-strong: rgba(232, 230, 223, 0.28);
-    --accent: #3cff8e;
-    --accent-ink: #0e0e12;
-    --indigo: #7b7fff;
-    --noise-blend: screen;
+    /* Signal, after dark — deep slate canvas, lifted panels, luminous indigo */
+    --bg: #0b0c0f;
+    --bg-soft: #131418;
+    --surface: #16171c;
+    --ink: #ececee;
+    --ink-muted: #9b9ca3;
+    --ink-faint: #6c6d74;
+    --rule: rgba(236, 236, 238, 0.1);
+    --rule-strong: rgba(236, 236, 238, 0.2);
+    --accent: #7c7bff;
+    --accent-soft: rgba(124, 123, 255, 0.14);
+    --accent-ink: #0b0c0f;
+    --indigo: var(--accent);
 
     color-scheme: dark;
   }
@@ -45,7 +47,7 @@
     background-color: var(--bg);
     color: var(--ink);
     font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-    font-feature-settings: "ss01", "ss02", "cv11";
+    font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -55,42 +57,136 @@
     background-color: var(--accent);
     color: var(--accent-ink);
   }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
 }
 
 @layer components {
-  /* Mono metadata strip — used as section headers across the site. */
+  /* Small mono label — eyebrows, metadata, metric captions. Used sparingly. */
   .mono-strip {
     font-family: var(--font-geist-mono), ui-monospace, monospace;
     font-size: 0.6875rem;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--ink-muted);
+    color: var(--ink-faint);
   }
 
-  /* Hairline rule between editorial blocks. */
-  .rule {
-    border-top: 1px solid var(--rule);
-  }
-
-  /* Display text — Fraunces, optical-size aware. */
+  /* Display face — Space Grotesk, tight and confident. */
   .display {
-    font-family: var(--font-fraunces), ui-serif, Georgia, serif;
-    font-feature-settings: "ss01";
-    line-height: 0.92;
-    letter-spacing: -0.025em;
+    font-family: var(--font-space), var(--font-geist-sans), sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    line-height: 1.05;
   }
 
-  /* Hero name — animates optical size from 14 → 144 on first paint. */
-  .display-hero {
-    font-family: var(--font-fraunces), ui-serif, Georgia, serif;
-    font-weight: 900;
-    font-variation-settings: "opsz" 14;
-    line-height: 0.86;
-    letter-spacing: -0.045em;
-    animation: opszPop 900ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  /* Availability pill — the one small status signal, done cleanly. */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3125rem 0.75rem;
+    border-radius: 999px;
+    background-color: var(--accent-soft);
+    color: var(--accent);
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
   }
 
-  /* Editorial link with a draw-in vermilion underline on hover. */
+  .pill-dot {
+    position: relative;
+    display: inline-flex;
+    height: 0.4375rem;
+    width: 0.4375rem;
+  }
+
+  .pill-dot::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background-color: var(--accent);
+    animation: signalPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  .pill-dot::after {
+    content: "";
+    position: relative;
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    border-radius: 999px;
+    background-color: var(--accent);
+  }
+
+  /* Lifted panel used for cards across the site. */
+  .card {
+    background-color: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(16, 17, 21, 0.04),
+      0 8px 24px -12px rgba(16, 17, 21, 0.1);
+  }
+
+  .dark .card {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Buttons — primary is ink-filled, secondary is a hairline outline. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6875rem 1.125rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    transition: transform 150ms ease, background-color 200ms ease,
+      border-color 200ms ease, color 200ms ease;
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-primary {
+    background-color: var(--ink);
+    color: var(--bg);
+    border: 1px solid var(--ink);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--ink);
+    border: 1px solid var(--rule-strong);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--ink);
+  }
+
+  .btn .arrow {
+    transition: transform 200ms ease;
+  }
+
+  .btn:hover .arrow {
+    transform: translateX(3px);
+  }
+
+  /* Understated text link with an accent underline that draws in on hover. */
   .editorial-link {
     position: relative;
     display: inline-block;
@@ -103,7 +199,7 @@
     position: absolute;
     left: 0;
     bottom: -2px;
-    height: 1px;
+    height: 1.5px;
     width: 100%;
     background-color: var(--accent);
     transform-origin: left;
@@ -119,39 +215,21 @@
     transform: scaleX(1);
   }
 
-  /* Halftone dot pattern — a single home-page block uses this. */
-  .halftone {
-    background-image: radial-gradient(var(--ink) 1px, transparent 1.5px);
-    background-size: 14px 14px;
-    background-position: 0 0;
-    opacity: 0.18;
-  }
-
-  .dark .halftone {
-    opacity: 0.24;
-  }
-
-  /* CRT scanline overlay — dark mode only, very subtle. */
-  .scanlines::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 2px,
-      rgba(0, 0, 0, 0.06) 2px,
-      rgba(0, 0, 0, 0.06) 3px
+  /* Hairline grid backdrop — quiet structure behind the hero, product-grade. */
+  .signal-grid {
+    background-image: linear-gradient(var(--rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(
+      ellipse 80% 70% at 50% 0%,
+      #000 0%,
+      transparent 75%
     );
-    z-index: 30;
-    mix-blend-mode: overlay;
-    opacity: 0;
-    transition: opacity 300ms ease;
-  }
-
-  .dark .scanlines::after {
-    opacity: 0.45;
+    mask-image: radial-gradient(
+      ellipse 80% 70% at 50% 0%,
+      #000 0%,
+      transparent 75%
+    );
   }
 }
 
@@ -170,44 +248,22 @@
   }
 }
 
-@keyframes opszPop {
+@keyframes signalPing {
   0% {
-    font-variation-settings: "opsz" 14;
-    transform: translateY(0.4em);
-    opacity: 0;
+    transform: scale(1);
+    opacity: 0.55;
   }
-  60% {
-    opacity: 1;
-  }
+  70%,
   100% {
-    font-variation-settings: "opsz" 144;
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes underlineDraw {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes blinkCaret {
-  0%, 49% {
-    opacity: 1;
-  }
-  50%, 100% {
+    transform: scale(2.4);
     opacity: 0;
   }
 }
 
-/* Scrollbar — neutral, doesn't fight the palette. */
+/* Scrollbar — neutral, matches the palette without shouting. */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -216,7 +272,8 @@
 
 ::-webkit-scrollbar-thumb {
   background: var(--rule-strong);
-  border-radius: 0;
+  border-radius: 999px;
+  border: 3px solid var(--bg);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -231,12 +288,5 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .display-hero {
-    font-variation-settings: "opsz" 144;
-    animation: none;
-    opacity: 1;
-    transform: none;
   }
 }

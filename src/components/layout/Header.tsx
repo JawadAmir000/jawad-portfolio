@@ -9,10 +9,9 @@ import { Container } from "./Container";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navItems = [
-  { href: "/", label: "Index", number: "00" },
-  { href: "/articles", label: "Writing", number: "01" },
-  { href: "/portfolio", label: "Work", number: "02" },
-  { href: "/about", label: "Bio", number: "03" },
+  { href: "/portfolio", label: "Work" },
+  { href: "/articles", label: "Writing" },
+  { href: "/about", label: "About" },
 ];
 
 export function Header() {
@@ -23,18 +22,18 @@ export function Header() {
     pathname === href || (href !== "/" && pathname?.startsWith(href));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-rule bg-bg/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-rule bg-bg/80 backdrop-blur-xl">
       <Container size="wide">
-        <div className="flex h-14 items-center justify-between gap-6">
-          <Link href="/" className="group flex items-baseline gap-3">
-            <span className="font-mono text-[11px] tracking-mono uppercase text-ink-faint">
-              §
+        <div className="flex h-16 items-center justify-between gap-6">
+          <Link href="/" className="group flex items-center gap-2.5">
+            <span
+              aria-hidden
+              className="grid h-7 w-7 place-items-center rounded-lg bg-ink text-bg font-display text-sm font-bold transition-colors group-hover:bg-accent group-hover:text-accent-ink"
+            >
+              J
             </span>
-            <span className="font-display text-lg font-semibold tracking-tight2 text-ink transition-colors group-hover:text-accent">
+            <span className="font-display text-[15px] font-semibold tracking-tight2 text-ink">
               Jawad Amir
-            </span>
-            <span className="hidden font-mono text-[11px] tracking-mono uppercase text-ink-faint sm:inline">
-              · Operator
             </span>
           </Link>
 
@@ -45,16 +44,17 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group relative px-3 py-1 font-mono text-[11px] tracking-mono uppercase"
+                  className={`relative rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                    active
+                      ? "text-ink"
+                      : "text-ink-muted hover:text-ink"
+                  }`}
                 >
-                  <span className="mr-1.5 text-ink-faint">{item.number}</span>
-                  <span className={active ? "text-ink" : "text-ink-muted group-hover:text-ink transition-colors"}>
-                    {item.label}
-                  </span>
+                  {item.label}
                   {active && (
                     <motion.span
                       layoutId="navUnderline"
-                      className="absolute left-3 right-3 -bottom-[15px] h-px bg-accent"
+                      className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-accent"
                       transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
                     />
                   )}
@@ -65,6 +65,12 @@ export function Header() {
 
           <div className="hidden items-center gap-4 md:flex">
             <ThemeToggle />
+            <a
+              href="mailto:xawadamir0@gmail.com"
+              className="btn btn-primary text-[13px]"
+            >
+              Get in touch
+            </a>
           </div>
 
           <button
@@ -92,17 +98,23 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="flex items-baseline gap-3 py-2.5 font-mono text-xs tracking-mono uppercase"
+                    className={`py-2.5 text-base font-medium ${
+                      active ? "text-accent" : "text-ink"
+                    }`}
                   >
-                    <span className="text-ink-faint">{item.number}</span>
-                    <span className={active ? "text-accent" : "text-ink"}>
-                      {item.label}
-                    </span>
+                    {item.label}
                   </Link>
                 );
               })}
-              <div className="mt-3 border-t border-rule pt-4">
+              <div className="mt-3 flex items-center justify-between border-t border-rule pt-4">
                 <ThemeToggle />
+                <a
+                  href="mailto:xawadamir0@gmail.com"
+                  onClick={() => setOpen(false)}
+                  className="btn btn-primary text-[13px]"
+                >
+                  Get in touch
+                </a>
               </div>
             </div>
           </Container>

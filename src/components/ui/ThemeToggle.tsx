@@ -2,6 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -12,11 +13,7 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return (
-      <span className="font-mono text-[11px] tracking-mono text-ink-faint uppercase">
-        [ light · dark ]
-      </span>
-    );
+    return <span className="block h-8 w-8" aria-hidden />;
   }
 
   const isDark = resolvedTheme === "dark";
@@ -25,14 +22,10 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="group font-mono text-[11px] tracking-mono uppercase text-ink-muted hover:text-ink transition-colors"
+      className="grid h-8 w-8 place-items-center rounded-lg border border-rule text-ink-muted transition-colors hover:border-rule-strong hover:text-ink"
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
     >
-      <span className="opacity-50">[ </span>
-      <span className={isDark ? "opacity-50" : "text-accent"}>light</span>
-      <span className="opacity-50"> · </span>
-      <span className={isDark ? "text-accent" : "opacity-50"}>dark</span>
-      <span className="opacity-50"> ]</span>
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </button>
   );
 }
