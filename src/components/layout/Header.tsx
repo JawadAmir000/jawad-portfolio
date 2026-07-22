@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Container } from "./Container";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navItems = [
   { href: "/portfolio", label: "Work" },
@@ -64,7 +63,6 @@ export function Header() {
           </nav>
 
           <div className="hidden items-center gap-4 md:flex">
-            <ThemeToggle />
             <a
               href="mailto:xawadamir0@gmail.com"
               className="btn btn-primary text-[13px]"
@@ -106,8 +104,7 @@ export function Header() {
                   </Link>
                 );
               })}
-              <div className="mt-3 flex items-center justify-between border-t border-rule pt-4">
-                <ThemeToggle />
+              <div className="mt-3 border-t border-rule pt-4">
                 <a
                   href="mailto:xawadamir0@gmail.com"
                   onClick={() => setOpen(false)}
